@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>filashkov</title>
+  <style>
+    /* Page setup */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #110011;
+      overflow: hidden;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Animated gradient text in the middle */
+    .text {
+      display: inline-block;
+      font-size: 5em;
+      font-weight: bold;
+      text-transform: lowercase;
+      letter-spacing: 0.1em;
+      background-image: linear-gradient(
+        90deg,
+        hsl(0,80%,50%),
+        hsl(40,80%,50%),
+        hsl(80,80%,50%)
+      );
+      background-repeat: no-repeat;
+      background-size: 200% auto;
+      background-position: left center;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      -webkit-text-stroke: 0px transparent;
+      margin-bottom: 50px; /* space for footer */
+    }
+    
+    /* Footer container */
+    footer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    /* Common logo styling: each logo is a square that will show the animated gradient through its mask */
+    .logo {
+      width: 40px;
+      height: 40px;
+      background-repeat: no-repeat;
+      background-size: 200% auto;
+      background-position: left center;
+    }
+    
+    /* VK (or replace with the correct slug) */
+    .vk {
+    -webkit-mask: url('https://cdn.simpleicons.org/vk?color=ffffff') no-repeat center/contain;
+    mask: url('https://cdn.simpleicons.org/vk?color=ffffff') no-repeat center/contain;
+    }
+
+    /* Telegram */
+    .telegram {
+    -webkit-mask: url('https://cdn.simpleicons.org/telegram?color=ffffff') no-repeat center/contain;
+    mask: url('https://cdn.simpleicons.org/telegram?color=ffffff') no-repeat center/contain;
+    }
+
+    /* Instagram */
+    .instagram {
+    -webkit-mask: url('https://cdn.simpleicons.org/instagram?color=ffffff') no-repeat center/contain;
+    mask: url('https://cdn.simpleicons.org/instagram?color=ffffff') no-repeat center/contain;
+}
+  </style>
+</head>
+<body>
+  <!-- Centered animated text -->
+  <div class="text" id="word">filashkov</div>
+  
+  <!-- Footer with social logos -->
+  <footer>
+    <a href="https://vk.com/filashkov" target="_blank" rel="noopener" class="logo vk" title="VK"></a>
+    <a href="https://t.me/filashkov" target="_blank" rel="noopener" class="logo telegram" title="Telegram"></a>
+    <a href="https://instagram.com/filashkov" target="_blank" rel="noopener" class="logo instagram" title="Instagram"></a>
+  </footer>
+  
+  <script>
+    let hue = 0;
+    let velocity = 0;
+    const logos = document.querySelectorAll('.logo');
+    const word = document.getElementById('word');
+    
+    // Update the animated gradient background for both text and logos
+    function updateGradient() {
+      const color1 = `hsl(${hue % 360}, 80%, 50%)`;
+      const color2 = `hsl(${(hue + 40) % 360}, 80%, 50%)`;
+      const color3 = `hsl(${(hue + 80) % 360}, 80%, 50%)`;
+      const gradient = `linear-gradient(90deg, ${color1}, ${color2}, ${color3})`;
+      word.style.backgroundImage = gradient;
+      logos.forEach(logo => {
+        logo.style.backgroundImage = gradient;
+      });
+    }
+    
+    // Animation loop: base hue shift plus scroll-induced acceleration
+    function animate() {
+      hue += 0.25;      // Base increment
+      hue += velocity;  // Add extra speed from mouse wheel events
+      velocity *= 0.9;  // Smooth decay of extra velocity
+      
+      updateGradient();
+      requestAnimationFrame(animate);
+    }
+    
+    // Listen for mouse wheel events to temporarily boost the speed
+    window.addEventListener('wheel', (e) => {
+      velocity += e.deltaY * 0.01;
+    });
+    
+    animate();
+  </script>
+</body>
+</html>
