@@ -17,6 +17,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      /* Optional: add touch-action none to ensure smooth touch event handling */
+      touch-action: none;
     }
     
     /* Animated gradient text in the middle */
@@ -62,21 +64,21 @@
     
     /* VK (or replace with the correct slug) */
     .vk {
-    -webkit-mask: url('https://cdn.simpleicons.org/vk?color=ffffff') no-repeat center/contain;
-    mask: url('https://cdn.simpleicons.org/vk?color=ffffff') no-repeat center/contain;
+      -webkit-mask: url('https://cdn.simpleicons.org/vk?color=ffffff') no-repeat center/contain;
+      mask: url('https://cdn.simpleicons.org/vk?color=ffffff') no-repeat center/contain;
     }
-
+    
     /* Telegram */
     .telegram {
-    -webkit-mask: url('https://cdn.simpleicons.org/telegram?color=ffffff') no-repeat center/contain;
-    mask: url('https://cdn.simpleicons.org/telegram?color=ffffff') no-repeat center/contain;
+      -webkit-mask: url('https://cdn.simpleicons.org/telegram?color=ffffff') no-repeat center/contain;
+      mask: url('https://cdn.simpleicons.org/telegram?color=ffffff') no-repeat center/contain;
     }
-
+    
     /* Instagram */
     .instagram {
-    -webkit-mask: url('https://cdn.simpleicons.org/instagram?color=ffffff') no-repeat center/contain;
-    mask: url('https://cdn.simpleicons.org/instagram?color=ffffff') no-repeat center/contain;
-}
+      -webkit-mask: url('https://cdn.simpleicons.org/instagram?color=ffffff') no-repeat center/contain;
+      mask: url('https://cdn.simpleicons.org/instagram?color=ffffff') no-repeat center/contain;
+    }
   </style>
 </head>
 <body>
@@ -96,6 +98,9 @@
     const logos = document.querySelectorAll('.logo');
     const word = document.getElementById('word');
     
+    // Variables for mobile touch tracking
+    let touchStartY = null;
+    
     // Update the animated gradient background for both text and logos
     function updateGradient() {
       const color1 = `hsl(${hue % 360}, 80%, 50%)`;
@@ -108,19 +113,44 @@
       });
     }
     
-    // Animation loop: base hue shift plus scroll-induced acceleration
+    // Animation loop: base hue shift plus scroll-induced or touch-induced acceleration
     function animate() {
       hue += 0.25;      // Base increment
-      hue += velocity;  // Add extra speed from mouse wheel events
+      hue += velocity;  // Add extra speed from mouse wheel or touch events
       velocity *= 0.9;  // Smooth decay of extra velocity
       
       updateGradient();
       requestAnimationFrame(animate);
     }
     
-    // Listen for mouse wheel events to temporarily boost the speed
+    // Listen for mouse wheel events to temporarily boost the speed (desktop)
     window.addEventListener('wheel', (e) => {
       velocity += e.deltaY * 0.01;
+    });
+    
+    // Mobile: capture touch start
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+    
+    // Mobile: capture touch move and calculate swipe delta
+    window.addEventListener('touchmove', (e) => {
+      if (touchStartY !== null && e.touches && e.touches.length > 0) {
+        let touchCurrentY = e.touches[0].clientY;
+        let deltaY = touchCurrentY - touchStartY;
+        velocity += deltaY * 0.01;  // Adjust factor as needed
+        touchStartY = touchCurrentY; // Update for next move
+      }
+    }, { passive: true });
+    
+    // Mobile: reset touchStartY on touch end or cancel
+    window.addEventListener('touchend', () => {
+      touchStartY = null;
+    });
+    window.addEventListener('touchcancel', () => {
+      touchStartY = null;
     });
     
     animate();
